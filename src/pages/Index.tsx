@@ -104,23 +104,23 @@ const Index = () => {
 
   if (!showEditor) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-black">
-        <div className="text-center space-y-8 animate-fade-in">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
-              <Icon name="Code2" size={32} className="text-black" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4">
+        <div className="text-center space-y-6 animate-fade-in w-full max-w-md">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+              <Icon name="Code2" size={24} className="text-black md:w-8 md:h-8" />
             </div>
-            <h1 className="text-5xl font-bold text-white">PlutkaEditSite</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white break-words">PlutkaEditSite</h1>
           </div>
           
-          <p className="text-muted-foreground text-lg max-w-md">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
             Создавайте сайты с помощью HTML, CSS и JavaScript
           </p>
 
           <Button 
             onClick={handleCreateSite}
             size="lg"
-            className="bg-primary hover:bg-primary/90 text-black font-semibold px-8 py-6 text-lg"
+            className="bg-primary hover:bg-primary/90 text-black font-semibold px-6 py-5 text-base w-full sm:w-auto"
           >
             Создать сайт
           </Button>
@@ -131,97 +131,101 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black flex flex-col">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-              <Icon name="Code2" size={18} className="text-black" />
+      <header className="border-b border-border bg-card sticky top-0 z-10">
+        <div className="px-3 py-2 sm:px-4 sm:py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded flex items-center justify-center flex-shrink-0">
+              <Icon name="Code2" size={14} className="text-black sm:w-[18px] sm:h-[18px]" />
             </div>
-            <h1 className="text-xl font-bold text-white">PlutkaEditSite</h1>
+            <h1 className="text-sm sm:text-xl font-bold text-white truncate">PlutkaEdit</h1>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
             <Button 
               onClick={() => setShowProjectsDialog(true)}
+              size="sm"
               variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-black"
+              className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
             >
-              <Icon name="FolderOpen" size={16} className="mr-2" />
-              Проекты
+              <Icon name="FolderOpen" size={16} className="sm:mr-1" />
+              <span className="hidden sm:inline">Проекты</span>
             </Button>
             <Button 
               onClick={handlePreview}
+              size="sm"
               variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-black"
+              className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
             >
-              <Icon name="Eye" size={16} className="mr-2" />
-              Превью
+              <Icon name="Eye" size={16} className="sm:mr-1" />
+              <span className="hidden sm:inline">Превью</span>
             </Button>
             <Button 
               onClick={handlePublish}
-              className="bg-primary hover:bg-primary/90 text-black font-semibold"
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-black font-semibold p-2 sm:px-3"
             >
-              <Icon name="Download" size={16} className="mr-2" />
-              Скачать HTML
+              <Icon name="Download" size={16} className="sm:mr-1" />
+              <span className="hidden sm:inline">HTML</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6">
-        <Card className="bg-card border-border p-6 space-y-4">
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <label className="text-sm text-muted-foreground mb-2 block">Название проекта</label>
+      <main className="flex-1 px-2 py-3 sm:px-4 sm:py-4 overflow-auto">
+        <Card className="bg-card border-border p-3 sm:p-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-muted-foreground mb-1 block">Название</label>
               <Input
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="Мой сайт"
-                className="bg-secondary border-border text-white"
+                className="bg-secondary border-border text-white text-sm h-9"
               />
             </div>
-            <div className="flex-1">
-              <label className="text-sm text-muted-foreground mb-2 block">Описание проекта</label>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-muted-foreground mb-1 block">Описание</label>
               <Input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Опишите ваш проект..."
-                className="bg-secondary border-border text-white"
+                placeholder="Описание..."
+                className="bg-secondary border-border text-white text-sm h-9"
               />
             </div>
             <div className="flex items-end">
               <Button
                 onClick={handleSaveProject}
+                size="sm"
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-black"
+                className="border-primary text-primary hover:bg-primary hover:text-black w-full sm:w-auto h-9"
               >
-                <Icon name="Save" size={16} className="mr-2" />
+                <Icon name="Save" size={14} className="mr-1" />
                 Сохранить
               </Button>
             </div>
           </div>
 
           <Tabs defaultValue="html" className="w-full">
-            <TabsList className="bg-secondary border-b border-border w-full justify-start rounded-none h-12">
+            <TabsList className="bg-secondary border-b border-border w-full justify-start rounded-none h-10">
               <TabsTrigger 
                 value="html" 
-                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground"
+                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground text-xs sm:text-sm px-2 sm:px-4"
               >
-                <Icon name="FileCode" size={16} className="mr-2" />
+                <Icon name="FileCode" size={14} className="mr-1" />
                 HTML
               </TabsTrigger>
               <TabsTrigger 
                 value="css"
-                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground"
+                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground text-xs sm:text-sm px-2 sm:px-4"
               >
-                <Icon name="Palette" size={16} className="mr-2" />
+                <Icon name="Palette" size={14} className="mr-1" />
                 CSS
               </TabsTrigger>
               <TabsTrigger 
                 value="js"
-                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground"
+                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground text-xs sm:text-sm px-2 sm:px-4"
               >
-                <Icon name="Zap" size={16} className="mr-2" />
+                <Icon name="Zap" size={14} className="mr-1" />
                 JS
               </TabsTrigger>
             </TabsList>
@@ -230,7 +234,7 @@ const Index = () => {
               <Textarea
                 value={htmlCode}
                 onChange={(e) => setHtmlCode(e.target.value)}
-                className="font-mono text-sm bg-secondary border-border text-white min-h-[500px] resize-none"
+                className="font-mono text-xs sm:text-sm bg-secondary border-border text-white min-h-[300px] sm:min-h-[400px] resize-none"
                 placeholder="Введите HTML код..."
               />
             </TabsContent>
@@ -239,7 +243,7 @@ const Index = () => {
               <Textarea
                 value={cssCode}
                 onChange={(e) => setCssCode(e.target.value)}
-                className="font-mono text-sm bg-secondary border-border text-white min-h-[500px] resize-none"
+                className="font-mono text-xs sm:text-sm bg-secondary border-border text-white min-h-[300px] sm:min-h-[400px] resize-none"
                 placeholder="Введите CSS код..."
               />
             </TabsContent>
@@ -248,7 +252,7 @@ const Index = () => {
               <Textarea
                 value={jsCode}
                 onChange={(e) => setJsCode(e.target.value)}
-                className="font-mono text-sm bg-secondary border-border text-white min-h-[500px] resize-none"
+                className="font-mono text-xs sm:text-sm bg-secondary border-border text-white min-h-[300px] sm:min-h-[400px] resize-none"
                 placeholder="Введите JavaScript код..."
               />
             </TabsContent>
@@ -257,11 +261,11 @@ const Index = () => {
       </main>
 
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-5xl h-[80vh] bg-card border-border">
+        <DialogContent className="max-w-[95vw] sm:max-w-5xl h-[85vh] bg-card border-border p-3 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-white">Превью сайта</DialogTitle>
+            <DialogTitle className="text-white text-sm sm:text-base">Превью сайта</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 bg-white rounded overflow-hidden">
+          <div className="flex-1 bg-white rounded overflow-hidden mt-2">
             <iframe
               srcDoc={getPreviewContent()}
               className="w-full h-full"
@@ -273,39 +277,39 @@ const Index = () => {
       </Dialog>
 
       <Dialog open={showProjectsDialog} onOpenChange={setShowProjectsDialog}>
-        <DialogContent className="bg-card border-border max-w-2xl">
+        <DialogContent className="bg-card border-border max-w-[95vw] sm:max-w-2xl p-4">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Icon name="FolderOpen" size={24} className="text-primary" />
+            <DialogTitle className="text-white flex items-center gap-2 text-sm sm:text-base">
+              <Icon name="FolderOpen" size={20} className="text-primary" />
               Сохраненные проекты
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
             {savedProjects.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">Пока нет сохраненных проектов</p>
+              <p className="text-muted-foreground text-center py-8 text-sm">Пока нет сохраненных проектов</p>
             ) : (
               savedProjects.map((project) => (
-                <Card key={project.name} className="bg-secondary border-border p-4 flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-white font-semibold">{project.name}</h3>
-                    <p className="text-muted-foreground text-sm">{project.description || 'Без описания'}</p>
+                <Card key={project.name} className="bg-secondary border-border p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold text-sm truncate">{project.name}</h3>
+                    <p className="text-muted-foreground text-xs truncate">{project.description || 'Без описания'}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full sm:w-auto">
                     <Button
                       onClick={() => handleLoadProject(project)}
                       size="sm"
-                      className="bg-primary hover:bg-primary/90 text-black"
+                      className="bg-primary hover:bg-primary/90 text-black flex-1 sm:flex-none text-xs"
                     >
-                      <Icon name="Upload" size={14} className="mr-1" />
+                      <Icon name="Upload" size={12} className="mr-1" />
                       Загрузить
                     </Button>
                     <Button
                       onClick={() => handleDeleteProject(project.name)}
                       size="sm"
                       variant="outline"
-                      className="border-destructive text-destructive hover:bg-destructive hover:text-white"
+                      className="border-destructive text-destructive hover:bg-destructive hover:text-white px-2"
                     >
-                      <Icon name="Trash2" size={14} />
+                      <Icon name="Trash2" size={12} />
                     </Button>
                   </div>
                 </Card>
@@ -314,8 +318,6 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-
     </div>
   );
 };
