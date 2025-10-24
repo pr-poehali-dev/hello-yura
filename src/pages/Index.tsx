@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,9 +16,68 @@ const Index = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [publishUrl, setPublishUrl] = useState('');
   const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [projectName, setProjectName] = useState('');
+  const [savedProjects, setSavedProjects] = useState<Array<{name: string, html: string, css: string, js: string, description: string}>>([]);
+  const [showProjectsDialog, setShowProjectsDialog] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('plutka-projects');
+    if (saved) {
+      setSavedProjects(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (htmlCode || cssCode || jsCode || description) {
+      const project = { html: htmlCode, css: cssCode, js: jsCode, description };
+      localStorage.setItem('plutka-current-project', JSON.stringify(project));
+    }
+  }, [htmlCode, cssCode, jsCode, description]);
 
   const handleCreateSite = () => {
+    const saved = localStorage.getItem('plutka-current-project');
+    if (saved) {
+      const project = JSON.parse(saved);
+      setHtmlCode(project.html);
+      setCssCode(project.css);
+      setJsCode(project.js);
+      setDescription(project.description);
+    }
     setShowEditor(true);
+  };
+
+  const handleSaveProject = () => {
+    if (!projectName.trim()) {
+      alert('Введите название проекта!');
+      return;
+    }
+    const newProject = {
+      name: projectName,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode,
+      description
+    };
+    const updated = [...savedProjects.filter(p => p.name !== projectName), newProject];
+    setSavedProjects(updated);
+    localStorage.setItem('plutka-projects', JSON.stringify(updated));
+    setProjectName('');
+    alert('Проект сохранен!');
+  };
+
+  const handleLoadProject = (project: {name: string, html: string, css: string, js: string, description: string}) => {
+    setHtmlCode(project.html);
+    setCssCode(project.css);
+    setJsCode(project.js);
+    setDescription(project.description);
+    setProjectName(project.name);
+    setShowProjectsDialog(false);
+  };
+
+  const handleDeleteProject = (name: string) => {
+    const updated = savedProjects.filter(p => p.name !== name);
+    setSavedProjects(updated);
+    localStorage.setItem('plutka-projects', JSON.stringify(updated));
   };
 
   const handlePreview = () => {
@@ -80,6 +139,14 @@ const Index = () => {
           
           <div className="flex gap-2">
             <Button 
+              onClick={() => setShowProjectsDialog(true)}
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary hover:text-black"
+            >
+              <Icon name="FolderOpen" size={16} className="mr-2" />
+              Проекты
+            </Button>
+            <Button 
               onClick={handlePreview}
               variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-black"
@@ -100,14 +167,35 @@ const Index = () => {
 
       <main className="flex-1 container mx-auto px-4 py-6">
         <Card className="bg-card border-border p-6 space-y-4">
-          <div>
-            <label className="text-sm text-muted-foreground mb-2 block">Описание проекта</label>
-            <Input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Опишите ваш проект..."
-              className="bg-secondary border-border text-white"
-            />
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="text-sm text-muted-foreground mb-2 block">Название проекта</label>
+              <Input
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                placeholder="Мой сайт"
+                className="bg-secondary border-border text-white"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm text-muted-foreground mb-2 block">Описание проекта</label>
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Опишите ваш проект..."
+                className="bg-secondary border-border text-white"
+              />
+            </div>
+            <div className="flex items-end">
+              <Button
+                onClick={handleSaveProject}
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-black"
+              >
+                <Icon name="Save" size={16} className="mr-2" />
+                Сохранить
+              </Button>
+            </div>
           </div>
 
           <Tabs defaultValue="html" className="w-full">
@@ -177,6 +265,49 @@ const Index = () => {
               title="Preview"
               sandbox="allow-scripts"
             />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showProjectsDialog} onOpenChange={setShowProjectsDialog}>
+        <DialogContent className="bg-card border-border max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Icon name="FolderOpen" size={24} className="text-primary" />
+              Сохраненные проекты
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {savedProjects.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">Пока нет сохраненных проектов</p>
+            ) : (
+              savedProjects.map((project) => (
+                <Card key={project.name} className="bg-secondary border-border p-4 flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-white font-semibold">{project.name}</h3>
+                    <p className="text-muted-foreground text-sm">{project.description || 'Без описания'}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleLoadProject(project)}
+                      size="sm"
+                      className="bg-primary hover:bg-primary/90 text-black"
+                    >
+                      <Icon name="Upload" size={14} className="mr-1" />
+                      Загрузить
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteProject(project.name)}
+                      size="sm"
+                      variant="outline"
+                      className="border-destructive text-destructive hover:bg-destructive hover:text-white"
+                    >
+                      <Icon name="Trash2" size={14} />
+                    </Button>
+                  </div>
+                </Card>
+              ))
+            )}
           </div>
         </DialogContent>
       </Dialog>
