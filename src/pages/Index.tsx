@@ -18,6 +18,7 @@ const Index = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [publishUrl, setPublishUrl] = useState('');
   const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [savedProjects, setSavedProjects] = useState<Array<{name: string, html: string, css: string, js: string, description: string}>>([]);
   const [showProjectsDialog, setShowProjectsDialog] = useState(false);
@@ -97,12 +98,32 @@ const Index = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleGenerateLink = () => {
-    const content = getPreviewContent();
-    const encoded = btoa(unescape(encodeURIComponent(content)));
-    const dataUrl = `data:text/html;base64,${encoded}`;
-    setPublishUrl(dataUrl);
-    setShowPublishDialog(true);
+  const handleGenerateLink = async () => {
+    setIsPublishing(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/a38f3a37-cfe9-4314-94cb-8ced7facf8fe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: htmlCode,
+          css: cssCode,
+          js: jsCode,
+          projectName: projectName || 'Untitled',
+          description: description
+        })
+      });
+      
+      const data = await response.json();
+      const shareUrl = `https://functions.poehali.dev/a38f3a37-cfe9-4314-94cb-8ced7facf8fe?id=${data.siteId}`;
+      setPublishUrl(shareUrl);
+      setShowPublishDialog(true);
+    } catch (error) {
+      alert('Ошибка при публикации: ' + error);
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   const getPreviewContent = () => {
@@ -175,9 +196,10 @@ const Index = () => {
               size="sm"
               variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
+              disabled={isPublishing}
             >
               <Icon name="Globe" size={16} className="sm:mr-1" />
-              <span className="hidden sm:inline">Ссылка</span>
+              <span className="hidden sm:inline">{isPublishing ? 'Публикация...' : 'Ссылка'}</span>
             </Button>
             <Button 
               onClick={handlePublish}
@@ -305,7 +327,7 @@ const Index = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-muted-foreground text-xs sm:text-sm">Откройте эту ссылку в новой вкладке для просмотра:</p>
+            <p className="text-muted-foreground text-xs sm:text-sm">Поделитесь этой ссылкой с коллегами для просмотра:</p>
             <div className="bg-secondary border border-border rounded p-2 break-all text-xs text-white max-h-32 overflow-y-auto">
               {publishUrl}
             </div>
@@ -326,7 +348,7 @@ const Index = () => {
                 Открыть
               </Button>
             </div>
-            <p className="text-muted-foreground text-xs italic">Примечание: Ссылка работает локально в вашем браузере. Для публикации в интернете скачайте HTML файл.</p>
+            <p className="text-muted-foreground text-xs italic">✨ Сайт опубликован онлайн! Ссылка работает у всех, кто её откроет.</p>
           </div>
         </DialogContent>
       </Dialog>

@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Publish site successfully",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "html": "<!DOCTYPE html><html><body><h1>Test</h1></body></html>",
+        "css": "body { background: #fff; }",
+        "js": "console.log('test');",
+        "projectName": "Test Site",
+        "description": "Test description"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "siteId": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get published site",
+      "method": "GET",
+      "path": "/?id=testsite",
+      "expectedStatus": 200
+    }
+  ]
+}
