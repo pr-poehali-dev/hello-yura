@@ -19,6 +19,7 @@ const Index = () => {
   const [publishUrl, setPublishUrl] = useState('');
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [shakeButton, setShakeButton] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [savedProjects, setSavedProjects] = useState<Array<{name: string, html: string, css: string, js: string, description: string}>>([]);
   const [showProjectsDialog, setShowProjectsDialog] = useState(false);
@@ -38,16 +39,20 @@ const Index = () => {
   }, [htmlCode, cssCode, jsCode, description]);
 
   const handleCreateSite = () => {
-    const saved = localStorage.getItem('plutka-current-project');
-    if (saved) {
-      const project = JSON.parse(saved);
-      setHtmlCode(project.html);
-      setCssCode(project.css);
-      setJsCode(project.js);
-      setDescription(project.description);
-    }
-    setShowEditor(true);
-    localStorage.setItem('plutka-editor-active', 'true');
+    setShakeButton(true);
+    setTimeout(() => {
+      const saved = localStorage.getItem('plutka-current-project');
+      if (saved) {
+        const project = JSON.parse(saved);
+        setHtmlCode(project.html);
+        setCssCode(project.css);
+        setJsCode(project.js);
+        setDescription(project.description);
+      }
+      setShowEditor(true);
+      localStorage.setItem('plutka-editor-active', 'true');
+      setShakeButton(false);
+    }, 500);
   };
 
   const handleSaveProject = () => {
@@ -136,40 +141,52 @@ const Index = () => {
 
   if (!showEditor) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4">
-        <div className="text-center space-y-6 animate-fade-in w-full max-w-md">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 retro-bg relative overflow-hidden">
+        <div className="absolute inset-0 scanline pointer-events-none"></div>
+        <div className="text-center space-y-6 animate-pixel-fade-in w-full max-w-md relative z-10">
+          <div className="flex items-center justify-center gap-2 mb-4 animate-float">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-primary pixel-border flex items-center justify-center flex-shrink-0 animate-pulse-glow">
               <Icon name="Code2" size={24} className="text-black md:w-8 md:h-8" />
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white break-words">PlutkaEditSite</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary drop-shadow-[0_0_10px_rgba(255,215,0,0.5)] break-words leading-relaxed">
+              PlutkaEdit
+            </h1>
           </div>
           
-          <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
-            Создавайте сайты с помощью HTML, CSS и JavaScript
+          <p className="text-primary text-xs sm:text-sm leading-relaxed opacity-80">
+            CREATE WEBSITES<br/>HTML • CSS • JS
           </p>
 
           <Button 
             onClick={handleCreateSite}
             size="lg"
-            className="bg-primary hover:bg-primary/90 text-black font-semibold px-6 py-5 text-base w-full sm:w-auto"
+            className={`bg-primary hover:bg-primary text-black font-bold px-6 py-6 text-xs sm:text-sm w-full sm:w-auto pixel-border transition-all ${
+              shakeButton ? 'animate-shake' : ''
+            }`}
           >
-            Создать сайт
+            <Icon name="Zap" size={16} className="mr-2" />
+            START
           </Button>
+          
+          <div className="flex gap-2 justify-center mt-4">
+            <div className="w-2 h-2 bg-primary animate-pulse"></div>
+            <div className="w-2 h-2 bg-primary animate-pulse" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-2 h-2 bg-primary animate-pulse" style={{animationDelay: '0.4s'}}></div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <header className="border-b border-border bg-card sticky top-0 z-10">
+    <div className="min-h-screen bg-black flex flex-col retro-bg">
+      <header className="border-b-4 border-primary bg-card sticky top-0 z-10 pixel-border">
         <div className="px-3 py-2 sm:px-4 sm:py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary pixel-border flex items-center justify-center flex-shrink-0">
               <Icon name="Code2" size={14} className="text-black sm:w-[18px] sm:h-[18px]" />
             </div>
-            <h1 className="text-sm sm:text-xl font-bold text-white truncate">PlutkaEdit</h1>
+            <h1 className="text-[8px] sm:text-xs font-bold text-primary truncate">PlutkaEdit</h1>
           </div>
           
           <div className="flex gap-1 sm:gap-2 flex-shrink-0">
@@ -177,61 +194,61 @@ const Index = () => {
               onClick={() => setShowProjectsDialog(true)}
               size="sm"
               variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-black p-1 sm:px-2 text-[8px] sm:text-xs pixel-border transition-all"
             >
-              <Icon name="FolderOpen" size={16} className="sm:mr-1" />
-              <span className="hidden sm:inline">Проекты</span>
+              <Icon name="FolderOpen" size={12} className="sm:mr-1" />
+              <span className="hidden sm:inline">FILES</span>
             </Button>
             <Button 
               onClick={handlePreview}
               size="sm"
               variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-black p-1 sm:px-2 text-[8px] sm:text-xs pixel-border transition-all"
             >
-              <Icon name="Eye" size={16} className="sm:mr-1" />
-              <span className="hidden sm:inline">Превью</span>
+              <Icon name="Eye" size={12} className="sm:mr-1" />
+              <span className="hidden sm:inline">VIEW</span>
             </Button>
             <Button 
               onClick={handleGenerateLink}
               size="sm"
               variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-black p-1 sm:px-2 text-[8px] sm:text-xs pixel-border transition-all"
               disabled={isPublishing}
             >
-              <Icon name="Globe" size={16} className="sm:mr-1" />
-              <span className="hidden sm:inline">{isPublishing ? 'Публикация...' : 'Ссылка'}</span>
+              <Icon name="Globe" size={12} className="sm:mr-1" />
+              <span className="hidden sm:inline">{isPublishing ? 'WAIT...' : 'LINK'}</span>
             </Button>
             <Button 
               onClick={handlePublish}
               size="sm"
-              className="bg-primary hover:bg-primary/90 text-black font-semibold p-2 sm:px-3"
+              className="bg-primary hover:bg-primary text-black font-bold p-1 sm:px-2 text-[8px] sm:text-xs pixel-border transition-all"
             >
-              <Icon name="Download" size={16} className="sm:mr-1" />
-              <span className="hidden sm:inline">HTML</span>
+              <Icon name="Download" size={12} className="sm:mr-1" />
+              <span className="hidden sm:inline">SAVE</span>
             </Button>
           </div>
         </div>
       </header>
 
       <main className="flex-1 px-2 py-3 sm:px-4 sm:py-4 overflow-auto">
-        <Card className="bg-card border-border p-3 sm:p-4 space-y-3">
+        <Card className="bg-card border-4 border-primary p-3 sm:p-4 space-y-3 pixel-border animate-pixel-fade-in">
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1 min-w-0">
-              <label className="text-xs text-muted-foreground mb-1 block">Название</label>
+              <label className="text-[10px] text-primary mb-1 block font-bold">NAME:</label>
               <Input
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                placeholder="Мой сайт"
-                className="bg-secondary border-border text-white text-sm h-9"
+                placeholder="MY-SITE"
+                className="bg-secondary border-2 border-primary text-white text-xs h-9 pixel-border code-editor"
               />
             </div>
             <div className="flex-1 min-w-0">
-              <label className="text-xs text-muted-foreground mb-1 block">Описание</label>
+              <label className="text-[10px] text-primary mb-1 block font-bold">DESC:</label>
               <Input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Описание..."
-                className="bg-secondary border-border text-white text-sm h-9"
+                placeholder="DESCRIPTION..."
+                className="bg-secondary border-2 border-primary text-white text-xs h-9 pixel-border code-editor"
               />
             </div>
             <div className="flex items-end">
@@ -239,35 +256,35 @@ const Index = () => {
                 onClick={handleSaveProject}
                 size="sm"
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-black w-full sm:w-auto h-9"
+                className="border-2 border-primary text-primary hover:bg-primary hover:text-black w-full sm:w-auto h-9 text-[10px] pixel-border font-bold"
               >
-                <Icon name="Save" size={14} className="mr-1" />
-                Сохранить
+                <Icon name="Save" size={12} className="mr-1" />
+                SAVE
               </Button>
             </div>
           </div>
 
           <Tabs defaultValue="html" className="w-full">
-            <TabsList className="bg-secondary border-b border-border w-full justify-start rounded-none h-10">
+            <TabsList className="bg-secondary border-b-4 border-primary w-full justify-start h-10 gap-1">
               <TabsTrigger 
                 value="html" 
-                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground text-xs sm:text-sm px-2 sm:px-4"
+                className="data-[state=active]:bg-primary data-[state=active]:text-black text-primary text-[10px] sm:text-xs px-2 sm:px-3 font-bold pixel-border data-[state=active]:animate-glitch"
               >
-                <Icon name="FileCode" size={14} className="mr-1" />
+                <Icon name="FileCode" size={12} className="mr-1" />
                 HTML
               </TabsTrigger>
               <TabsTrigger 
                 value="css"
-                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground text-xs sm:text-sm px-2 sm:px-4"
+                className="data-[state=active]:bg-primary data-[state=active]:text-black text-primary text-[10px] sm:text-xs px-2 sm:px-3 font-bold pixel-border data-[state=active]:animate-glitch"
               >
-                <Icon name="Palette" size={14} className="mr-1" />
+                <Icon name="Palette" size={12} className="mr-1" />
                 CSS
               </TabsTrigger>
               <TabsTrigger 
                 value="js"
-                className="data-[state=active]:bg-primary data-[state=active]:text-black text-muted-foreground text-xs sm:text-sm px-2 sm:px-4"
+                className="data-[state=active]:bg-primary data-[state=active]:text-black text-primary text-[10px] sm:text-xs px-2 sm:px-3 font-bold pixel-border data-[state=active]:animate-glitch"
               >
-                <Icon name="Zap" size={14} className="mr-1" />
+                <Icon name="Zap" size={12} className="mr-1" />
                 JS
               </TabsTrigger>
             </TabsList>
@@ -276,8 +293,8 @@ const Index = () => {
               <Textarea
                 value={htmlCode}
                 onChange={(e) => setHtmlCode(e.target.value)}
-                className="font-mono text-xs sm:text-sm bg-secondary border-border text-white min-h-[300px] sm:min-h-[400px] resize-none"
-                placeholder="Введите HTML код..."
+                className="code-editor text-xs sm:text-sm bg-secondary border-2 border-primary text-white min-h-[300px] sm:min-h-[400px] resize-none focus:border-primary focus:ring-2 focus:ring-primary"
+                placeholder="> ENTER HTML CODE..."
               />
             </TabsContent>
 
@@ -285,8 +302,8 @@ const Index = () => {
               <Textarea
                 value={cssCode}
                 onChange={(e) => setCssCode(e.target.value)}
-                className="font-mono text-xs sm:text-sm bg-secondary border-border text-white min-h-[300px] sm:min-h-[400px] resize-none"
-                placeholder="Введите CSS код..."
+                className="code-editor text-xs sm:text-sm bg-secondary border-2 border-primary text-white min-h-[300px] sm:min-h-[400px] resize-none focus:border-primary focus:ring-2 focus:ring-primary"
+                placeholder="> ENTER CSS CODE..."
               />
             </TabsContent>
 
@@ -294,8 +311,8 @@ const Index = () => {
               <Textarea
                 value={jsCode}
                 onChange={(e) => setJsCode(e.target.value)}
-                className="font-mono text-xs sm:text-sm bg-secondary border-border text-white min-h-[300px] sm:min-h-[400px] resize-none"
-                placeholder="Введите JavaScript код..."
+                className="code-editor text-xs sm:text-sm bg-secondary border-2 border-primary text-white min-h-[300px] sm:min-h-[400px] resize-none focus:border-primary focus:ring-2 focus:ring-primary"
+                placeholder="> ENTER JS CODE..."
               />
             </TabsContent>
           </Tabs>
