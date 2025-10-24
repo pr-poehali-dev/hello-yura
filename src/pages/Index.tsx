@@ -116,7 +116,7 @@ const Index = () => {
       });
       
       const data = await response.json();
-      const shareUrl = `https://functions.poehali.dev/a38f3a37-cfe9-4314-94cb-8ced7facf8fe?id=${data.siteId}`;
+      const shareUrl = `https://plut.studio/${data.siteId}`;
       setPublishUrl(shareUrl);
       setShowPublishDialog(true);
     } catch (error) {
