@@ -85,10 +85,13 @@ const Index = () => {
   };
 
   const handlePublish = () => {
-    const randomId = Math.random().toString(36).substring(7);
-    const url = `https://plutka-${randomId}.plutkaedit.site`;
-    setPublishUrl(url);
-    setShowPublishDialog(true);
+    const blob = new Blob([getPreviewContent()], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${projectName || 'website'}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const getPreviewContent = () => {
@@ -158,8 +161,8 @@ const Index = () => {
               onClick={handlePublish}
               className="bg-primary hover:bg-primary/90 text-black font-semibold"
             >
-              <Icon name="Globe" size={16} className="mr-2" />
-              Опубликовать
+              <Icon name="Download" size={16} className="mr-2" />
+              Скачать HTML
             </Button>
           </div>
         </div>
@@ -312,39 +315,7 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Icon name="CheckCircle2" size={24} className="text-primary" />
-              Сайт опубликован!
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-muted-foreground">Ваш сайт доступен по адресу:</p>
-            <div className="flex items-center gap-2">
-              <Input
-                value={publishUrl}
-                readOnly
-                className="bg-secondary border-border text-white font-mono"
-              />
-              <Button
-                onClick={() => navigator.clipboard.writeText(publishUrl)}
-                variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-black"
-              >
-                <Icon name="Copy" size={16} />
-              </Button>
-            </div>
-            <Button
-              onClick={() => window.open(publishUrl, '_blank')}
-              className="w-full bg-primary hover:bg-primary/90 text-black font-semibold"
-            >
-              Открыть сайт
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 };
