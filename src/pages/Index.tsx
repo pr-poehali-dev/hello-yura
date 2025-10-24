@@ -8,7 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
-  const [showEditor, setShowEditor] = useState(false);
+  const [showEditor, setShowEditor] = useState(() => {
+    return localStorage.getItem('plutka-editor-active') === 'true';
+  });
   const [htmlCode, setHtmlCode] = useState('<!DOCTYPE html>\n<html>\n<head>\n  <title>My Site</title>\n</head>\n<body>\n  <h1>Hello World!</h1>\n</body>\n</html>');
   const [cssCode, setCssCode] = useState('body {\n  font-family: Arial, sans-serif;\n  padding: 20px;\n  background: #f0f0f0;\n}\n\nh1 {\n  color: #333;\n}');
   const [jsCode, setJsCode] = useState('console.log("Hello from JS!");');
@@ -44,6 +46,7 @@ const Index = () => {
       setDescription(project.description);
     }
     setShowEditor(true);
+    localStorage.setItem('plutka-editor-active', 'true');
   };
 
   const handleSaveProject = () => {
@@ -92,6 +95,14 @@ const Index = () => {
     a.download = `${projectName || 'website'}.html`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleGenerateLink = () => {
+    const content = getPreviewContent();
+    const encoded = btoa(unescape(encodeURIComponent(content)));
+    const dataUrl = `data:text/html;base64,${encoded}`;
+    setPublishUrl(dataUrl);
+    setShowPublishDialog(true);
   };
 
   const getPreviewContent = () => {
@@ -158,6 +169,15 @@ const Index = () => {
             >
               <Icon name="Eye" size={16} className="sm:mr-1" />
               <span className="hidden sm:inline">Превью</span>
+            </Button>
+            <Button 
+              onClick={handleGenerateLink}
+              size="sm"
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary hover:text-black p-2 sm:px-3"
+            >
+              <Icon name="Globe" size={16} className="sm:mr-1" />
+              <span className="hidden sm:inline">Ссылка</span>
             </Button>
             <Button 
               onClick={handlePublish}
@@ -272,6 +292,41 @@ const Index = () => {
               title="Preview"
               sandbox="allow-scripts"
             />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+        <DialogContent className="bg-card border-border max-w-[95vw] sm:max-w-lg p-4">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2 text-sm sm:text-base">
+              <Icon name="Globe" size={20} className="text-primary" />
+              Ссылка на сайт
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-muted-foreground text-xs sm:text-sm">Откройте эту ссылку в новой вкладке для просмотра:</p>
+            <div className="bg-secondary border border-border rounded p-2 break-all text-xs text-white max-h-32 overflow-y-auto">
+              {publishUrl}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => navigator.clipboard.writeText(publishUrl)}
+                variant="outline"
+                className="flex-1 border-primary text-primary hover:bg-primary hover:text-black text-xs sm:text-sm"
+              >
+                <Icon name="Copy" size={14} className="mr-1" />
+                Копировать
+              </Button>
+              <Button
+                onClick={() => window.open(publishUrl, '_blank')}
+                className="flex-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs sm:text-sm"
+              >
+                <Icon name="ExternalLink" size={14} className="mr-1" />
+                Открыть
+              </Button>
+            </div>
+            <p className="text-muted-foreground text-xs italic">Примечание: Ссылка работает локально в вашем браузере. Для публикации в интернете скачайте HTML файл.</p>
           </div>
         </DialogContent>
       </Dialog>
